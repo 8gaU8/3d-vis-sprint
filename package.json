@@ -1,0 +1,26 @@
+{
+  "name": "3d-vis-sprint",
+  "private": true,
+  "version": "0.0.0",
+  "type": "module",
+  "scripts": {
+    "dev": "vite",
+    "build": "vite build",
+    "preview": "vite preview",
+    "format": "prettier --write src/**/*.js",
+    "lint": "eslint --fix",
+    "fix": "npm run format && npm run lint"
+  },
+  "devDependencies": {
+    "@types/three": "^0.173.0",
+    "eslint": "^9.21.0",
+    "eslint-config-prettier": "^10.0.1",
+    "eslint-plugin-import": "^2.31.0",
+    "prettier": "^3.5.2",
+    "vite": "^6.2.0"
+  },
+  "dependencies": {
+    "lil-gui": "^0.20.0",
+    "three": "^0.173.0"
+  }
+}
