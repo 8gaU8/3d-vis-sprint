@@ -1,6 +1,5 @@
 import * as THREE from 'three'
 
-
 const createGeometry = (height, width) => {
   const geometry = new THREE.BufferGeometry()
   const positions = []

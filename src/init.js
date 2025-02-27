@@ -1,4 +1,4 @@
-import {GUI} from 'lil-gui'
+import { GUI } from 'lil-gui'
 import * as THREE from 'three'
 
 export const initCamera = (cameraType) => {
@@ -69,7 +69,6 @@ export const initGUI = (uniforms, video) => {
   videoGUI.add(pausePlayObj, 'pausePlay')
   videoGUI.add(pausePlayObj, 'add10sec')
 }
-
 
 export const initScene = () => {
   const scene = new THREE.Scene()
