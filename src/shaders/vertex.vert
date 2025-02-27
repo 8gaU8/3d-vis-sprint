@@ -17,13 +17,13 @@ vec3 XYZ2Lab(vec3 XYZ) {
   float Yn = 100.;
   float Zn = 108.8840;
 
-  float X = XYZ.x / Xn;
-  float Y = XYZ.y / Yn; 
-  float Z = XYZ.z / Zn;
-  float L = 116. * f(Y ) - 16.;
-  float a = 500. * (f(X ) - f(Y ));
-  float b = 200. * (f(Y ) - f(Z ));
-  return vec3(L, a, b);
+  float fX = f(XYZ.x / Xn);
+  float fY = f(XYZ.y / Yn); 
+  float fZ = f(XYZ.z / Zn);
+  float L = 116. * fX - 16.;
+  float a = 500. * (fX - fY);
+  float b = 200. * (fY - fZ);
+  return vec3(a, L, b);
 }
 
 vec3 rgb2XYZ(vec3 rgb) {
