@@ -3,7 +3,7 @@
 import * as THREE from 'three'
 import { OrbitControls } from 'three/addons/controls/OrbitControls.js'
 import Stats from 'three/addons/libs/stats.module.js'
-import { HTMLMesh, InteractiveGroup, XRControllerModelFactory } from 'three/examples/jsm/Addons.js'
+import { HTMLMesh, InteractiveGroup } from 'three/examples/jsm/Addons.js'
 
 import { createFloor, createVideoObjects } from './createObjects'
 import { initCamera, initLights, initRenderer, initScene } from './init'

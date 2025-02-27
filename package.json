@@ -7,7 +7,7 @@
     "dev": "vite",
     "localbuild": "vite build --mode httpslocal",
     "build": "vite build",
-    "prebuild": "npm run fix && npm run clean",
+    "prebuild": "npm run clean",
     "clean": "rm -rf dist",
     "preview": "vite preview",
     "format": "prettier --write src/**/*.js",
