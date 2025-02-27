@@ -1,5 +1,7 @@
-import { GUI } from 'lil-gui'
+/* eslint-disable import/no-unresolved */
 import * as THREE from 'three'
+import { GUI } from 'three/addons/libs/lil-gui.module.min.js'
+import { VRButton } from 'three/addons/webxr/VRButton.js'
 
 export const initCamera = (cameraType) => {
   if (cameraType === THREE.OrthographicCamera) {
@@ -11,7 +13,7 @@ export const initCamera = (cameraType) => {
       frustumSize / 2,
       frustumSize / -2,
       0.1,
-      10000,
+      1000,
     )
     camera.rotation.x = -Math.PI / 3.5
     camera.position.y = 10
@@ -19,18 +21,27 @@ export const initCamera = (cameraType) => {
     return camera
   }
   if (cameraType === THREE.PerspectiveCamera) {
-    const camera = new THREE.PerspectiveCamera(60, window.innerWidth / window.innerHeight, 0.1, 50)
-    camera.position.z = 5
+    const camera = new THREE.PerspectiveCamera(
+      100,
+      window.innerWidth / window.innerHeight,
+      0.001,
+      10000,
+    )
+    camera.position.y = 2
+    camera.position.z = 1
+    camera.rotation.y = -Math.PI
     return camera
   }
 
-  throw new Error('Unknown camera type')
+  return null
 }
 
 export const initRenderer = () => {
   // init
   const renderer = new THREE.WebGLRenderer({ antialias: true })
-  renderer.shadowMap.enabled = true
+  renderer.xr.enabled = true
+  renderer.shadowMap.enabled = false
+  document.body.appendChild(VRButton.createButton(renderer))
   renderer.setSize(window.innerWidth, window.innerHeight)
   renderer.setPixelRatio(window.devicePixelRatio)
   return renderer
