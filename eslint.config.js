@@ -1,8 +1,7 @@
+import babelParser from '@babel/eslint-parser'
 import js from '@eslint/js'
 import prettier from 'eslint-config-prettier'
 import importPlugin from 'eslint-plugin-import'
-import babelParser from "@babel/eslint-parser";
-
 
 export default [
   // js files
@@ -24,6 +23,7 @@ export default [
         console: 'readonly',
         requestAnimationFrame: 'readonly',
         URL: 'readonly',
+        navigator: 'readonly',
       },
       parserOptions: {
         ecmaVersion: 'latest',
