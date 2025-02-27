@@ -49,7 +49,7 @@ vec3 rgb2xyY(vec3 rgb) {
 void main() {
 
   color = texture2D ( tex, position.xy ).rgb;
-  gl_PointSize = length(position.xy - .5) * 10.;
+  gl_PointSize = pow(1.-length(position.xy - .5), 2.)  * 10.;
   vec3 pointPosition;
   if (type == 0) {
     pointPosition = color.rgb;
