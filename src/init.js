@@ -1,6 +1,6 @@
 /* eslint-disable import/no-unresolved */
+
 import * as THREE from 'three'
-import { GUI } from 'three/addons/libs/lil-gui.module.min.js'
 import { VRButton } from 'three/addons/webxr/VRButton.js'
 
 export const initCamera = (cameraType) => {
@@ -45,40 +45,6 @@ export const initRenderer = () => {
   renderer.setSize(window.innerWidth, window.innerHeight)
   renderer.setPixelRatio(window.devicePixelRatio)
   return renderer
-}
-
-export const initGUI = (uniforms, video) => {
-  const gui = new GUI()
-  const colorSpaceGUI = gui.addFolder('Color Space')
-  const csNameMap = {
-    RGB: 0,
-    XYZ: 1,
-    XYy: 2,
-    LAB: 3,
-  }
-
-  colorSpaceGUI
-    .add({ 'Color Space': 'RGB' }, 'Color Space', ['RGB', 'XYZ', 'XYy', 'LAB'])
-    .onChange((value) => {
-      uniforms.type.value = csNameMap[value]
-    })
-
-  const pausePlayObj = {
-    pausePlay: () => {
-      if (!video.paused) {
-        video.pause()
-      } else {
-        video.play()
-      }
-    },
-    add10sec: () => {
-      video.currentTime = video.currentTime + 10
-    },
-  }
-
-  const videoGUI = gui.addFolder('Video')
-  videoGUI.add(pausePlayObj, 'pausePlay')
-  videoGUI.add(pausePlayObj, 'add10sec')
 }
 
 export const initScene = () => {

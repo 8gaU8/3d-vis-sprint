@@ -35,7 +35,7 @@ export const createFloor = () => {
   return floor
 }
 
-export const createVideoObjects = (uniforms, video, scene) => {
+export const createVideoObjects = (uniforms, video) => {
   const texture = new THREE.VideoTexture(video)
 
   texture.minFilter = THREE.NearestFilter
@@ -46,18 +46,24 @@ export const createVideoObjects = (uniforms, video, scene) => {
   // building objects
   const height = video.videoHeight
   const width = video.videoWidth
+  const objsHeight = 1
+
+  const videoObjects = new THREE.Group()
 
   // build video plane
   const videoPlaneWidth = 2
   const videoPlaneHeight = (videoPlaneWidth * video.videoHeight) / video.videoWidth
   const videoPlane = createTexturePlane(texture, videoPlaneWidth, videoPlaneHeight)
-  scene.add(videoPlane)
+  videoPlane.translateY(objsHeight)
+  videoObjects.add(videoPlane)
 
   uniforms.tex.value = texture
 
   const pointObject = createColorSpacePoint(uniforms, height, width)
-  scene.add(pointObject)
+  pointObject.translateY(objsHeight)
+  videoObjects.add(pointObject)
 
   const pointShadowObject = createShadowColorSpacePoint(uniforms, height, width)
-  scene.add(pointShadowObject)
+  videoObjects.add(pointShadowObject)
+  return videoObjects
 }

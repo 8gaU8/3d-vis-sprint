@@ -5,7 +5,8 @@ import { OrbitControls } from 'three/addons/controls/OrbitControls.js'
 import Stats from 'three/addons/libs/stats.module.js'
 
 import { createFloor, createVideoObjects } from './createObjects'
-import { initCamera, initGUI, initLights, initRenderer, initScene } from './init'
+import { initCamera, initLights, initRenderer, initScene } from './init'
+import { GUIManager } from './initGUI'
 import { drawHelper, onWindowResizeFactory } from './utils'
 import { generateVideoElement } from './videoElement'
 
@@ -25,12 +26,20 @@ const main = async () => {
 
   const video = await generateVideoElement()
   video.onloadeddata = () => {
-    createVideoObjects(uniforms, video, scene)
+    const objs = createVideoObjects(uniforms, video, scene)
+    scene.add(objs)
     video.play()
   }
-  initGUI(uniforms, video)
+  // initNormalGUI(uniforms, video)
 
   const renderer = initRenderer()
+  const guiManager = new GUIManager(uniforms, video, scene, renderer, camera)
+  renderer.xr.addEventListener('sessionstart', () => {
+    guiManager.enableXR()
+  })
+  renderer.xr.addEventListener('sessionend', () => {
+    guiManager.disableXR()
+  })
 
   container.appendChild(renderer.domElement)
 

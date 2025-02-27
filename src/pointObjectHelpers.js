@@ -3,7 +3,7 @@ import * as THREE from 'three'
 const createGeometry = (height, width) => {
   const geometry = new THREE.BufferGeometry()
   const positions = []
-  const step = 3
+  const step = 4
 
   for (let i = 0; i < height; i += step)
     for (let j = 0; j < width; j += step) {
