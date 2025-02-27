@@ -15,3 +15,10 @@ export const onWindowResizeFactory = (camera, renderer) => {
   }
   return onWindowResize
 }
+
+export const loadTextureAsync = (url) => {
+  return new Promise((resolve, reject) => {
+    const loader = new THREE.TextureLoader()
+    loader.load(url, resolve, undefined, reject)
+  })
+}
