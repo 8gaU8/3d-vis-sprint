@@ -1,6 +1,8 @@
-// /** @type {import('vite').UserConfig} */
+import { defineConfig } from 'vite'
 
-export default {}
+export default defineConfig({
+  base: process.env.NODE_ENV === 'production' ? '/hand-synth-project/' : '/', // GitHub Pages の場合はリポジトリ名
+})
 // import { readFileSync, existsSync, unlinkSync, writeFileSync } from 'fs'
 // import path from 'path'
 // export default {
