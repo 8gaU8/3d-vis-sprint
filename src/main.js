@@ -6,53 +6,61 @@ import Stats from 'three/addons/libs/stats.module.js'
 
 import {
   createColorSpacePoint,
+  createFloor,
   createShadowColorSpacePoint,
-  createVideoPlane,
+  createVideoPlane as createTexturePlane,
 } from './createObjects'
-import { initCamera, initGUI, initRenderer, initScene } from './init'
+import { initCamera, initGUI, initLights, initRenderer, initScene } from './init'
 import { drawHelper, onWindowResizeFactory } from './utils'
 import { generateVideoElement } from './videoElement'
+
+const createVideoObjects = (uniforms, video, scene) => {
+  const texture = new THREE.VideoTexture(video)
+
+  texture.minFilter = THREE.NearestFilter
+  texture.magFilter = THREE.NearestFilter
+  texture.generateMipmaps = false
+  texture.format = THREE.RGBAFormat
+
+  // building objects
+  const height = video.videoHeight
+  const width = video.videoWidth
+
+  // build video plane
+  const videoPlaneWidth = 2
+  const videoPlaneHeight = (videoPlaneWidth * video.videoHeight) / video.videoWidth
+  const videoPlane = createTexturePlane(texture, videoPlaneWidth, videoPlaneHeight)
+  scene.add(videoPlane)
+
+  uniforms.tex.value = texture
+
+  const pointObject = createColorSpacePoint(uniforms, height, width)
+  scene.add(pointObject)
+
+  const pointShadowObject = createShadowColorSpacePoint(uniforms, height, width)
+  scene.add(pointShadowObject)
+}
 
 const main = async () => {
   const container = document.getElementById('container')
 
   const camera = initCamera(THREE.PerspectiveCamera)
   const scene = initScene()
-  const video = generateVideoElement()
+  initLights(scene)
+  const floor = createFloor()
+  scene.add(floor)
 
-  video.onloadeddata = () => {
-    const texture = new THREE.VideoTexture(video)
-
-    texture.minFilter = THREE.NearestFilter
-    texture.magFilter = THREE.NearestFilter
-    texture.generateMipmaps = false
-    texture.format = THREE.RGBAFormat
-
-    // building objects
-    const height = video.videoHeight
-    const width = video.videoWidth
-
-    console.log(texture)
-
-    // build video plane
-    const videoPlaneWidth = 2
-    const videoPlaneHeight = (videoPlaneWidth * video.videoHeight) / video.videoWidth
-    const videoPlane = createVideoPlane(texture, videoPlaneWidth, videoPlaneHeight)
-    scene.add(videoPlane)
-
-    const uniforms = {
-      tex: { type: 't', value: texture },
-      type: { type: 'i', value: 0 },
-    }
-
-    const pointObject = createColorSpacePoint(uniforms, height, width)
-    scene.add(pointObject)
-
-    const pointShadowObject = createShadowColorSpacePoint(uniforms, height, width)
-    scene.add(pointShadowObject)
-
-    initGUI(uniforms, video)
+  const uniforms = {
+    tex: { type: 't', value: null },
+    type: { type: 'i', value: 0 },
   }
+
+  const video = generateVideoElement()
+  video.onloadeddata = () => {
+    createVideoObjects(uniforms, video, scene)
+    video.play()
+  }
+  initGUI(uniforms, video)
 
   const renderer = initRenderer()
 
