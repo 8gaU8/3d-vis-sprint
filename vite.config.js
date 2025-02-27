@@ -1,7 +1,8 @@
 import { defineConfig } from 'vite'
 
+console.log(process.env.NODE_VR_ENV)
 export default defineConfig({
-  base: process.env.NODE_ENV === 'production' ? '/hand-synth-project/' : '/', // GitHub Pages の場合はリポジトリ名
+  base: process.env.NODE_ENV === 'production' ? '/3d-vis-sprint/' : '/', // GitHub Pages の場合はリポジトリ名
 })
 // import { readFileSync, existsSync, unlinkSync, writeFileSync } from 'fs'
 // import path from 'path'
