@@ -1,3 +1,4 @@
+uniform float alpha;
 varying vec3 color;
 
 void main() {
@@ -5,6 +6,6 @@ void main() {
     discard;  
 
   gl_FragColor.rgb = color;
-  gl_FragColor.a = 0.5;
+  gl_FragColor.a = alpha;
 
 }

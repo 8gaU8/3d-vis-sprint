@@ -35,7 +35,10 @@ export const createFloor = () => {
   return floor
 }
 
-export const createVideoObjects = (uniforms, video) => {
+export const createVideoObjects = (scene, uniforms, video) => {
+  const previousVideoObjects = scene.getObjectByName('videoObjects')
+  if (previousVideoObjects) scene.remove(previousVideoObjects)
+
   const texture = new THREE.VideoTexture(video)
 
   texture.minFilter = THREE.NearestFilter
@@ -49,6 +52,7 @@ export const createVideoObjects = (uniforms, video) => {
   const objsHeight = 1
 
   const videoObjects = new THREE.Group()
+  videoObjects.name = 'videoObjects'
 
   // build video plane
   const videoPlaneWidth = 2
@@ -66,4 +70,9 @@ export const createVideoObjects = (uniforms, video) => {
   const pointShadowObject = createShadowColorSpacePoint(uniforms, height, width)
   videoObjects.add(pointShadowObject)
   return videoObjects
+}
+
+export const objectsUpdaterFactory = (scene, uniforms, video) => () => {
+  const objs = createVideoObjects(scene, uniforms, video)
+  scene.add(objs)
 }

@@ -2,14 +2,6 @@ import * as THREE from 'three'
 import { HTMLMesh, InteractiveGroup, XRControllerModelFactory } from 'three/examples/jsm/Addons.js'
 import { GUI } from 'three/examples/jsm/libs/lil-gui.module.min.js'
 
-const initXrGUI = (uniforms, video, scene, renderer, camera) => {
-  // define controllers
-  const controllers = initControllers(scene, renderer)
-  const gui = initNormalGUI(uniforms, video)
-  initInteractiveGroup(scene, renderer, camera, controllers, gui)
-  return gui
-}
-
 const initControllers = (scene, renderer) => {
   const geometry = new THREE.BufferGeometry()
   geometry.setFromPoints([new THREE.Vector3(0, 0, 0), new THREE.Vector3(0, 0, -5)])
@@ -52,7 +44,15 @@ const initInteractiveGroup = (scene, renderer, camera, controllers, gui) => {
   scene.add(group)
 }
 
-const initNormalGUI = (uniforms, video) => {
+const initXrGUI = (uniforms, video, scene, renderer, camera, objectsUpdater) => {
+  // define controllers
+  const controllers = initControllers(scene, renderer)
+  const gui = initNormalGUI(uniforms, video, objectsUpdater)
+  initInteractiveGroup(scene, renderer, camera, controllers, gui)
+  return gui
+}
+
+const initNormalGUI = (uniforms, video, objectsUpdater) => {
   const colorSpaceOnChange = (value) => {
     console.log('change to color space', value)
     const csNameMap = {
@@ -78,6 +78,15 @@ const initNormalGUI = (uniforms, video) => {
   colorSpaceGUI.add(colorSpaceObject, 'XYy')
   colorSpaceGUI.add(colorSpaceObject, 'LAB')
 
+  const materialGUI = gui.addFolder('Material')
+  materialGUI.add(uniforms.alpha, 'value', 0, 1).name('Alpha')
+  materialGUI
+    .add(uniforms.step, 'value', 1, 10, 1)
+    .name('Step')
+    .onChange(() => {
+      objectsUpdater()
+    })
+
   const pausePlayObj = {
     pausePlay: () => {
       if (!video.paused) video.pause()
@@ -99,16 +108,18 @@ const initNormalGUI = (uniforms, video) => {
 }
 
 export class GUIManager {
-  constructor(uniforms, video, scene, renderer, camera) {
+  constructor(uniforms, video, scene, renderer, camera, objectsUpdater) {
     this.uniforms = uniforms
     this.video = video
     this.scene = scene
     this.renderer = renderer
     this.camera = camera
+    this.objectsUpdater = objectsUpdater
+    console.log(this.objectsUpdater)
   }
 
   init() {
-    this.gui = initNormalGUI(this.uniforms, this.video, this.scene, this.renderer, this.camera)
+    this.gui = initNormalGUI(this.uniforms, this.video, this.objectsUpdater)
     this.addEventListeners()
   }
 
@@ -124,12 +135,19 @@ export class GUIManager {
   enableXR() {
     if (this.gui) this.gui.destroy()
     console.log('enableXR')
-    this.gui = initXrGUI(this.uniforms, this.video, this.scene, this.renderer, this.camera)
+    this.gui = initXrGUI(
+      this.uniforms,
+      this.video,
+      this.scene,
+      this.renderer,
+      this.camera,
+      this.objectsUpdater,
+    )
   }
 
   disableXR() {
     if (this.gui) this.gui.destroy()
     console.log('disableXR')
-    this.gui = initNormalGUI(this.uniforms, this.video)
+    this.gui = initNormalGUI(this.uniforms, this.video, this.objectsUpdater)
   }
 }

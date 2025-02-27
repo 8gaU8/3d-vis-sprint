@@ -1,9 +1,8 @@
 import * as THREE from 'three'
 
-const createGeometry = (height, width) => {
+const createGeometry = (height, width, step) => {
   const geometry = new THREE.BufferGeometry()
   const positions = []
-  const step = 3
 
   for (let i = 0; i < height; i += step)
     for (let j = 0; j < width; j += step) {
@@ -26,7 +25,6 @@ const createMaterial = (uniforms, vertexShader, fragmentShader, additionalOption
     fragmentShader: fragmentShader,
     uniforms: uniforms,
     transparent: true,
-    alphaHash: 0.5,
   }
   const material = new THREE.ShaderMaterial({ ...basicOptions, ...additionalOptions })
   return material
@@ -42,7 +40,7 @@ export const createPoints = (
 ) => {
   const material = createMaterial(uniforms, vertexShader, fragmentShader, additionalOptions)
 
-  const geometry = createGeometry(height, width)
+  const geometry = createGeometry(height, width, uniforms.step.value)
   const points = new THREE.Points(geometry, material)
   return points
 }

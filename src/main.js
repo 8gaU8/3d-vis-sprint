@@ -5,7 +5,7 @@ import { OrbitControls } from 'three/addons/controls/OrbitControls.js'
 import Stats from 'three/addons/libs/stats.module.js'
 import { HTMLMesh, InteractiveGroup } from 'three/examples/jsm/Addons.js'
 
-import { createFloor, createVideoObjects } from './createObjects'
+import { createFloor, objectsUpdaterFactory } from './createObjects'
 import { initCamera, initLights, initRenderer, initScene } from './init'
 import { GUIManager } from './initGUI'
 import { drawHelper, onWindowResizeFactory } from './utils'
@@ -23,18 +23,22 @@ const main = async () => {
   const uniforms = {
     tex: { type: 't', value: null },
     type: { type: 'i', value: 0 },
-  }
-
-  const video = await generateVideoElement()
-  video.onloadeddata = () => {
-    const objs = createVideoObjects(uniforms, video, scene)
-    scene.add(objs)
-    video.play()
+    alpha: { type: 'f', value: 0.9 },
+    step: { type: 'i', value: 3 },
   }
 
   const renderer = initRenderer()
-  const guiManager = new GUIManager(uniforms, video, scene, renderer, camera)
-  guiManager.init()
+
+  const video = await generateVideoElement()
+  const objectsUpdater = objectsUpdaterFactory(scene, uniforms, video)
+
+  video.onloadeddata = () => {
+    objectsUpdater()
+    video.play()
+
+    const guiManager = new GUIManager(uniforms, video, scene, renderer, camera, objectsUpdater)
+    guiManager.init()
+  }
 
   container.appendChild(renderer.domElement)
 
