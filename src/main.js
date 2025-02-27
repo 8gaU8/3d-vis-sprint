@@ -55,7 +55,7 @@ const main = async () => {
     type: { type: 'i', value: 0 },
   }
 
-  const video = generateVideoElement()
+  const video = await generateVideoElement()
   video.onloadeddata = () => {
     createVideoObjects(uniforms, video, scene)
     video.play()
