@@ -1,3 +1,4 @@
+import {GUI} from 'lil-gui'
 import * as THREE from 'three'
 
 export const initCamera = (cameraType) => {
@@ -27,10 +28,51 @@ export const initCamera = (cameraType) => {
 }
 
 export const initRenderer = () => {
-  const canvas = document.querySelector('#c')
-  const renderer = new THREE.WebGLRenderer({ antialias: true, canvas })
+  // init
+  const renderer = new THREE.WebGLRenderer({ antialias: true })
   renderer.shadowMap.enabled = true
   renderer.setSize(window.innerWidth, window.innerHeight)
   renderer.setPixelRatio(window.devicePixelRatio)
   return renderer
+}
+
+export const initGUI = (uniforms, video) => {
+  const gui = new GUI()
+  const colorSpaceGUI = gui.addFolder('Color Space')
+  const csNameMap = {
+    RGB: 0,
+    XYZ: 1,
+    XYy: 2,
+    LAB: 3,
+  }
+
+  colorSpaceGUI
+    .add({ 'Color Space': 'RGB' }, 'Color Space', ['RGB', 'XYZ', 'XYy', 'LAB'])
+    .onChange((value) => {
+      uniforms.type.value = csNameMap[value]
+    })
+
+  const pausePlayObj = {
+    pausePlay: () => {
+      if (!video.paused) {
+        video.pause()
+      } else {
+        video.play()
+      }
+    },
+    add10sec: () => {
+      video.currentTime = video.currentTime + 10
+    },
+  }
+
+  const videoGUI = gui.addFolder('Video')
+  videoGUI.add(pausePlayObj, 'pausePlay')
+  videoGUI.add(pausePlayObj, 'add10sec')
+}
+
+
+export const initScene = () => {
+  const scene = new THREE.Scene()
+  scene.background = new THREE.Color(0xcccccc)
+  return scene
 }
