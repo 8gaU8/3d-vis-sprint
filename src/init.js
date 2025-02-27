@@ -75,3 +75,14 @@ export const initScene = () => {
   scene.background = new THREE.Color(0xcccccc)
   return scene
 }
+
+export const initLights = (scene) => {
+  const ambientLight = new THREE.AmbientLight(0x404040)
+  ambientLight.name = 'ambientLight'
+  scene.add(ambientLight)
+  const directionalLight = new THREE.DirectionalLight(0xffffff, 0.5)
+  directionalLight.position.set(0, 1, 0)
+  directionalLight.castShadow = true
+  directionalLight.name = 'directionalLight'
+  scene.add(directionalLight)
+}
