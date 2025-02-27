@@ -83,7 +83,7 @@ const initNormalGUI = (uniforms, video, objectsUpdater) => {
   materialGUI
     .add(uniforms.step, 'value', 1, 10, 1)
     .name('Step')
-    .onChange(() => {
+    .onFinishChange(() => {
       objectsUpdater()
     })
 
@@ -115,7 +115,6 @@ export class GUIManager {
     this.renderer = renderer
     this.camera = camera
     this.objectsUpdater = objectsUpdater
-    console.log(this.objectsUpdater)
   }
 
   init() {
