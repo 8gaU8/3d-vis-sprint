@@ -24,3 +24,13 @@ export const createShadowColorSpacePoint = (uniforms, height, width) => {
     transparent: false,
   })
 }
+
+export const createFloor = () => {
+  const geometry = new THREE.PlaneGeometry(10, 10)
+  const material = new THREE.MeshLambertMaterial({ color: 0xffffff })
+  const floor = new THREE.Mesh(geometry, material)
+  floor.position.y = -0.01
+  floor.rotation.x = -Math.PI / 2
+  floor.receiveShadow = false
+  return floor
+}
