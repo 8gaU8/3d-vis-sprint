@@ -40,15 +40,16 @@ const initInteractiveGroup = (scene, renderer, camera, controllers, gui) => {
   group.listenToPointerEvents(renderer, camera)
   group.listenToXRControllerEvents(controller1)
   group.listenToXRControllerEvents(controller2)
-  scene.add(group)
 
   const mesh = new HTMLMesh(gui.domElement)
   mesh.position.x = -0.75
   mesh.position.y = 1.5
-  mesh.position.z = -0.5
-  mesh.rotation.y = Math.PI / 4
+  mesh.position.z = 1
+  mesh.rotation.y = Math.PI / 3
   mesh.scale.setScalar(2)
   group.add(mesh)
+
+  scene.add(group)
 }
 
 const initNormalGUI = (uniforms, video) => {
@@ -86,14 +87,6 @@ const initNormalGUI = (uniforms, video) => {
   return gui
 }
 
-export const initGUI = (uniforms, video, scene, renderer, camera) => {
-  if (renderer.xr.enabled) {
-    return initXrGUI(uniforms, video, scene, renderer, camera)
-  } else {
-    return initNormalGUI(uniforms, video)
-  }
-}
-
 export class GUIManager {
   constructor(uniforms, video, scene, renderer, camera) {
     this.uniforms = uniforms
@@ -101,17 +94,30 @@ export class GUIManager {
     this.scene = scene
     this.renderer = renderer
     this.camera = camera
-    this.gui = initNormalGUI(this.uniforms, this.video, this.scene, this.renderer, this.camera)
+  }
+
+  init() {
+    this.gui = initXrGUI(this.uniforms, this.video, this.scene, this.renderer, this.camera)
+    this.addEventListeners()
+  }
+
+  addEventListeners() {
+    this.renderer.xr.addEventListener('sessionstart', () => {
+      this.enableXR()
+    })
+    this.renderer.xr.addEventListener('sessionend', () => {
+      this.disableXR()
+    })
   }
 
   enableXR() {
-    this.gui.destroy()
+    if (this.gui) this.gui.destroy()
     console.log('enableXR')
     this.gui = initXrGUI(this.uniforms, this.video, this.scene, this.renderer, this.camera)
   }
 
   disableXR() {
-    this.gui.destroy()
+    if (this.gui) this.gui.destroy()
     console.log('disableXR')
     this.gui = initNormalGUI(this.uniforms, this.video)
   }

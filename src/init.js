@@ -28,7 +28,7 @@ export const initCamera = (cameraType) => {
       10000,
     )
     camera.position.y = 2
-    camera.position.z = 1
+    camera.position.z = 2
     camera.rotation.y = -Math.PI
     return camera
   }

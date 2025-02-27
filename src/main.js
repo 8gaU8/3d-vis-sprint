@@ -30,16 +30,10 @@ const main = async () => {
     scene.add(objs)
     video.play()
   }
-  // initNormalGUI(uniforms, video)
 
   const renderer = initRenderer()
   const guiManager = new GUIManager(uniforms, video, scene, renderer, camera)
-  renderer.xr.addEventListener('sessionstart', () => {
-    guiManager.enableXR()
-  })
-  renderer.xr.addEventListener('sessionend', () => {
-    guiManager.disableXR()
-  })
+  guiManager.init()
 
   container.appendChild(renderer.domElement)
 
