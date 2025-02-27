@@ -6,12 +6,17 @@
   "scripts": {
     "dev": "vite",
     "build": "vite build",
+    "localbuild": "LOCAL_BUILD=local vite build",
+    "prelocalbuild": "npm run prebuild",
+    "prebuild": "npm run fix && npm run clean",
+    "clean": "rm -rf dist",
     "preview": "vite preview",
     "format": "prettier --write src/**/*.js",
-    "lint": "eslint --fix",
+    "lint": "eslint --fix src/**/*.js",
     "fix": "npm run format && npm run lint"
   },
   "devDependencies": {
+    "@babel/eslint-parser": "^7.26.8",
     "@types/three": "^0.173.0",
     "eslint": "^9.21.0",
     "eslint-config-prettier": "^10.0.1",

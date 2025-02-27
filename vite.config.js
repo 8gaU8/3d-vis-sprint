@@ -1,9 +1,15 @@
 import { defineConfig } from 'vite'
 
-console.log(process.env.NODE_VR_ENV)
-export default defineConfig({
-  base: process.env.NODE_ENV === 'production' ? '/3d-vis-sprint/' : '/', // GitHub Pages の場合はリポジトリ名
+
+export default defineConfig(() => {
+  if (process.env.LOCAL_BUILD === 'local') {
+    return {}
+  }
+  return {
+    base: process.env.NODE_ENV === 'production' ? '/3d-vis-sprint/' : '/',
+  }
 })
+
 // import { readFileSync, existsSync, unlinkSync, writeFileSync } from 'fs'
 // import path from 'path'
 // export default {
