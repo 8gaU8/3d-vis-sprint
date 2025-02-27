@@ -1,12 +1,10 @@
-import { defineConfig } from 'vite'
+/* eslint-disable no-undef */
+import { defineConfig, loadEnv } from 'vite'
 
-
-export default defineConfig(() => {
-  if (process.env.LOCAL_BUILD === 'local') {
-    return {}
-  }
+export default defineConfig(({ mode }) => {
+  process.env = { ...process.env, ...loadEnv(mode, process.cwd()) }
   return {
-    base: process.env.NODE_ENV === 'production' ? '/3d-vis-sprint/' : '/',
+    base: mode === 'production' ? '/3d-vis-sprint/' : '/',
   }
 })
 

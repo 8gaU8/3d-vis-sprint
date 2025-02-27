@@ -5,10 +5,9 @@
   "type": "module",
   "scripts": {
     "dev": "vite",
+    "localbuild": "vite build --mode httpslocal",
     "build": "vite build",
-    "localbuild": "LOCAL_BUILD=local vite build",
-    "prelocalbuild": "npm run prebuild",
-    "prebuild": "npm run fix && npm run clean",
+    "_prebuild": "npm run fix && npm run clean",
     "clean": "rm -rf dist",
     "preview": "vite preview",
     "format": "prettier --write src/**/*.js",
