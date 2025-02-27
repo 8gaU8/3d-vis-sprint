@@ -5,9 +5,7 @@ export const drawHelper = (scene) => {
 }
 
 export const onWindowResizeFactory = (camera, renderer) => {
-  console.log('generated')
   const onWindowResize = () => {
-    console.log('resize')
     camera.aspect = window.innerWidth / window.innerHeight
     camera.updateProjectionMatrix()
 
