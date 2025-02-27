@@ -42,10 +42,10 @@ const initInteractiveGroup = (scene, renderer, camera, controllers, gui) => {
   group.listenToXRControllerEvents(controller2)
 
   const mesh = new HTMLMesh(gui.domElement)
-  mesh.position.x = -0.75
+  mesh.position.x = 1.5
   mesh.position.y = 1.5
-  mesh.position.z = 1
-  mesh.rotation.y = Math.PI / 3
+  mesh.position.z = 0.5
+  mesh.rotation.y = -Math.PI / 2 + Math.PI / 3
   mesh.scale.setScalar(2)
   group.add(mesh)
 
@@ -53,37 +53,48 @@ const initInteractiveGroup = (scene, renderer, camera, controllers, gui) => {
 }
 
 const initNormalGUI = (uniforms, video) => {
-  const gui = new GUI({ width: 300 })
-  const colorSpaceGUI = gui.addFolder('Color Space')
-  const csNameMap = {
-    RGB: 0,
-    XYZ: 1,
-    XYy: 2,
-    LAB: 3,
+  const colorSpaceOnChange = (value) => {
+    console.log('change to color space', value)
+    const csNameMap = {
+      RGB: 0,
+      XYZ: 1,
+      XYy: 2,
+      LAB: 3,
+    }
+    uniforms.type.value = csNameMap[value]
+  }
+  const colorSpaceObject = {
+    RGB: () => colorSpaceOnChange('RGB'),
+    XYZ: () => colorSpaceOnChange('XYZ'),
+    XYy: () => colorSpaceOnChange('XYy'),
+    LAB: () => colorSpaceOnChange('LAB'),
   }
 
-  colorSpaceGUI
-    .add({ 'Color Space': 'RGB' }, 'Color Space', ['RGB', 'XYZ', 'XYy', 'LAB'])
-    .onChange((value) => {
-      uniforms.type.value = csNameMap[value]
-    })
+  const gui = new GUI({ width: 300 })
+
+  const colorSpaceGUI = gui.addFolder('Color Space')
+  colorSpaceGUI.add(colorSpaceObject, 'RGB')
+  colorSpaceGUI.add(colorSpaceObject, 'XYZ')
+  colorSpaceGUI.add(colorSpaceObject, 'XYy')
+  colorSpaceGUI.add(colorSpaceObject, 'LAB')
 
   const pausePlayObj = {
     pausePlay: () => {
-      if (!video.paused) {
-        video.pause()
-      } else {
-        video.play()
-      }
+      if (!video.paused) video.pause()
+      else video.play()
     },
     add10sec: () => {
-      video.currentTime = video.currentTime + 10
+      video.currentTime += 10
+    },
+    sub10sec: () => {
+      video.currentTime -= 10
     },
   }
 
   const videoGUI = gui.addFolder('Video')
   videoGUI.add(pausePlayObj, 'pausePlay')
   videoGUI.add(pausePlayObj, 'add10sec')
+  videoGUI.add(pausePlayObj, 'sub10sec')
   return gui
 }
 
@@ -97,7 +108,7 @@ export class GUIManager {
   }
 
   init() {
-    this.gui = initXrGUI(this.uniforms, this.video, this.scene, this.renderer, this.camera)
+    this.gui = initNormalGUI(this.uniforms, this.video, this.scene, this.renderer, this.camera)
     this.addEventListeners()
   }
 
