@@ -2,14 +2,7 @@ uniform sampler2D tex;
 varying vec3 color;
 uniform int type;
 
-float f(float t){
-  float delta = 6. / 29.;
-  if(t > delta*delta*delta){
-    return pow(t, 1./3.);
-  } else {
-    return t / (3. * delta * delta) + 4. / 29.;
-  }
-}
+#define f(t) t > 0.00885645 ? pow(t, 1./3.) : t / (3. * 0.04280618) + 0.13793103
 
 vec3 XYZ2Lab(vec3 XYZ) {
   // Under D65
