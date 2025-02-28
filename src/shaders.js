@@ -5,10 +5,10 @@ import shadowFragmentShader from './shaders/shadow.frag?raw'
 import shadowVertexShader from './shaders/shadow.vert?raw'
 
 const colorspaceMacros = {
-  RGB: { COLOR_SPACE: 'color.rgb' },
-  XYZ: { COLOR_SPACE: 'rgb2XYZ(color.rgb)' },
-  xyY: { COLOR_SPACE: 'XYZ2xyY(rgb2XYZ(color.rgb))' },
-  Lab: { COLOR_SPACE: 'XYZ2Lab(rgb2XYZ(color.rgb)) / 10.' },
+  RGB: { 'COLOR_SPACE(x)': 'x' },
+  XYZ: { 'COLOR_SPACE(x)': 'rgb2XYZ(x)' },
+  xyY: { 'COLOR_SPACE(x)': 'XYZ2xyY(rgb2XYZ(x))' },
+  Lab: { 'COLOR_SPACE(x)': 'XYZ2Lab(rgb2XYZ(x)) / 10.' },
 }
 
 const colorspaceNames = Object.keys(colorspaceMacros)

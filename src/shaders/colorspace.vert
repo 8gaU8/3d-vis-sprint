@@ -44,7 +44,7 @@ void main() {
   color = texture2D ( tex, position.xy ).rgb;
 
   gl_PointSize = pow(1.-length(position.xy - .5), 2.)  * pointSize;
-  vec3 pointPosition = COLOR_SPACE;
+  vec3 pointPosition = COLOR_SPACE(color.rgb);
   gl_Position = projectionMatrix * modelViewMatrix * vec4(pointPosition, 1.0);
 
 }
