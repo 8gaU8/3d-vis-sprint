@@ -6,6 +6,7 @@ import {
   colorspaceVertexShader,
   shadowFragmentShader,
   shadowVertexShader,
+  colorspaceMacros,
 } from './shaders'
 
 const createTexturePlane = (texture, videoPlaneWidth, videoPlaneHeight) => {
@@ -50,7 +51,8 @@ export const createVideoPlane = (video) => {
   return videoPlane
 }
 
-export const createColorspaceObjects = (uniforms, colorspaceMacro, video) => {
+export const createColorspaceObjects = (colorspaceObjectsParameters) => {
+  const { uniforms, selectedColorSpace, step, video } = colorspaceObjectsParameters
   const texture = new THREE.VideoTexture(video)
 
   texture.minFilter = THREE.NearestFilter
@@ -67,9 +69,11 @@ export const createColorspaceObjects = (uniforms, colorspaceMacro, video) => {
 
   uniforms.tex.value = texture
 
+  console.log('eselected macro:', selectedColorSpace, colorspaceMacros[selectedColorSpace])
   const pointObject = createPoints(
     uniforms,
-    colorspaceMacro,
+    colorspaceMacros[selectedColorSpace],
+    step,
     height,
     width,
     colorspaceVertexShader,
@@ -80,7 +84,8 @@ export const createColorspaceObjects = (uniforms, colorspaceMacro, video) => {
 
   const pointShadowObject = createPoints(
     uniforms,
-    colorspaceMacro,
+    colorspaceMacros[selectedColorSpace],
+    step,
     height,
     width,
     shadowVertexShader,
@@ -91,14 +96,26 @@ export const createColorspaceObjects = (uniforms, colorspaceMacro, video) => {
   )
 
   colorspaceObjects.add(pointShadowObject)
+  colorspaceObjects.name = 'colorspaceObjects'
+
   return colorspaceObjects
 }
 
-export const updateObjectsFactory = (scene, colorspaceMacro, uniforms, video) => () => {
-  const colorspaceObjectsName = 'colorspaceObjects'
-  const previousColorspaceObjects = scene.getObjectByName(colorspaceObjectsName)
+export const updateObjectsFactory = (scene, colorspaceMacro, uniforms, video) => {
+  const updateObjects = () => {
+    const colorspaceObjectsName = 'colorspaceObjects'
+    const previousColorspaceObjects = scene.getObjectByName(colorspaceObjectsName)
+    if (previousColorspaceObjects) scene.remove(previousColorspaceObjects)
+    const colorspaceObjects = createColorspaceObjects(colorspaceMacro, uniforms, video)
+    colorspaceObjects.name = colorspaceObjectsName
+    scene.add(colorspaceObjects)
+  }
+  return updateObjects
+}
+
+export const updateObjects = (scene, colorspaceObjectsParameters) => {
+  const colorspaceObjects = createColorspaceObjects(colorspaceObjectsParameters)
+  const previousColorspaceObjects = scene.getObjectByName(colorspaceObjects.name)
   if (previousColorspaceObjects) scene.remove(previousColorspaceObjects)
-  const colorspaceObjects = createColorspaceObjects(colorspaceMacro, uniforms, video)
-  colorspaceObjects.name = colorspaceObjectsName
   scene.add(colorspaceObjects)
 }

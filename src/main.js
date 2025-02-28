@@ -4,71 +4,25 @@ import * as THREE from 'three'
 import { OrbitControls } from 'three/addons/controls/OrbitControls.js'
 import Stats from 'three/addons/libs/stats.module.js'
 
-import { createFloor, updateObjectsFactory, createVideoPlane } from './createObjects'
+import { createFloor, createVideoPlane, updateObjects } from './createObjects'
 import { initCamera, initLights, initRenderer, initScene } from './init'
-import { GUIManager } from './initGUI'
+import { GUIManager, initGUI } from './initGUI'
 import { drawHelper, onWindowResizeFactory } from './utils'
 import { generateVideoElement } from './videoElement'
 import { XRControllerManager } from './xr'
 
 const main = async () => {
+  // initial setup
   const container = document.getElementById('container')
-
   const camera = initCamera(THREE.PerspectiveCamera)
   const scene = initScene()
   initLights(scene)
   const floor = createFloor()
   scene.add(floor)
-
-  const uniforms = {
-    tex: { type: 't', value: null },
-    type: { type: 'i', value: 0 },
-    alpha: { type: 'f', value: 0.9 },
-    step: { type: 'i', value: 3 },
-  }
-
-  const colorspaceMacro = {
-    COLOR_SPACE: 'rgb2XYZ(color.rgb)',
-  }
-
-  const colorspaceObjectsParameters = {
-    uniforms: uniforms,
-    selectedColorSpace: 'RGB',
-    step: 3,
-  }
-
   const renderer = initRenderer()
-  const xrControllerManager = new XRControllerManager(renderer, camera)
-  const xrControllers = xrControllerManager.getXrControllers()
-  scene.add(xrControllers)
-
-  const video = await generateVideoElement()
-  const updateObjects = updateObjectsFactory(scene, uniforms, colorspaceMacro, video)
-
-  const guiManager = new GUIManager(
-    uniforms,
-    video,
-    scene,
-    updateObjects,
-    xrControllerManager,
-  )
-
-  renderer.xr.addEventListener('sessionstart', () => {
-    guiManager.enableXR()
-  })
-  renderer.xr.addEventListener('sessionend', () => {
-    guiManager.disableXR()
-  })
-
-  video.onloadeddata = () => {
-    const videoPlane = createVideoPlane(video)
-    scene.add(videoPlane)
-    video.play()
-
-    guiManager.init()
-  }
-
   container.appendChild(renderer.domElement)
+  // resize event
+  window.addEventListener('resize', onWindowResizeFactory(camera, renderer), false)
 
   const controls = new OrbitControls(camera, renderer.domElement)
   controls.enable = true
@@ -76,7 +30,50 @@ const main = async () => {
   const stats = new Stats()
   container.appendChild(stats.dom)
 
-  window.addEventListener('resize', onWindowResizeFactory(camera, renderer), false)
+  // setup video
+  const video = await generateVideoElement()
+
+  // define parameters of colorspace objects
+  const uniforms = {
+    tex: { type: 't', value: null },
+    pointSize: { type: 'f', value: 10.0 },
+    type: { type: 'i', value: 0 },
+    alpha: { type: 'f', value: 0.9 },
+  }
+
+  const colorspaceObjectsParameters = {
+    uniforms: uniforms,
+    selectedColorSpace: 'RGB',
+    step: 3,
+    video: video,
+  }
+
+  // setup XR andGUI
+  const onChange = (newColorspaceObjParameters) => {
+    updateObjects(scene, newColorspaceObjParameters)
+  }
+  const gui = initGUI(colorspaceObjectsParameters, onChange)
+  const xrControllerManager = new XRControllerManager(renderer, camera)
+  const guiManager = new GUIManager(gui, scene, xrControllerManager)
+  // XR events
+  renderer.xr.addEventListener('sessionstart', () => {
+    guiManager.enableXR()
+  })
+
+  renderer.xr.addEventListener('sessionend', () => {
+    guiManager.disableXR()
+  })
+
+  // start video
+  video.onloadeddata = () => {
+    updateObjects(scene, colorspaceObjectsParameters)
+
+    const videoPlane = createVideoPlane(video)
+    scene.add(videoPlane)
+
+    video.play()
+  }
+
   drawHelper(scene)
 
   const render = () => {

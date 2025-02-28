@@ -1,6 +1,8 @@
 uniform sampler2D tex;
-varying vec3 color;
 uniform int type;
+uniform float pointSize;
+
+varying vec3 color;
 
 #define f(t) t > 0.00885645 ? pow(t, 1./3.) : t / (3. * 0.04280618) + 0.13793103
 
@@ -41,7 +43,7 @@ vec3 XYZ2xyY(vec3 XYZ) {
 void main() {
 
   color = texture2D ( tex, position.xy ).rgb;
-  gl_PointSize = pow(1.-length(position.xy - .5), 2.)  * 10.;
+  gl_PointSize = pow(1.-length(position.xy - .5), 2.)  * pointSize;
   vec3 pointPosition;
   if (type == 0) {
     pointPosition = color.rgb;

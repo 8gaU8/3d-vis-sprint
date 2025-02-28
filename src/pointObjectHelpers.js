@@ -19,14 +19,20 @@ const createGeometry = (height, width, step) => {
   return geometry
 }
 
-const createMaterial = (uniforms, colorspaceMacro, vertexShader, fragmentShader, additionalOptions) => {
+const createMaterial = (
+  uniforms,
+  colorspaceMacro,
+  vertexShader,
+  fragmentShader,
+  additionalOptions,
+) => {
   console.log(colorspaceMacro)
   const basicOptions = {
     vertexShader: vertexShader,
     fragmentShader: fragmentShader,
     uniforms: uniforms,
     transparent: true,
-    defines: colorspaceMacro
+    defines: colorspaceMacro,
   }
   const material = new THREE.ShaderMaterial({ ...basicOptions, ...additionalOptions })
   return material
@@ -35,15 +41,22 @@ const createMaterial = (uniforms, colorspaceMacro, vertexShader, fragmentShader,
 export const createPoints = (
   uniforms,
   colorspaceMacro,
+  step,
   height,
   width,
   vertexShader,
   fragmentShader,
   additionalOptions = {},
 ) => {
-  const material = createMaterial(uniforms, colorspaceMacro, vertexShader, fragmentShader, additionalOptions)
+  const material = createMaterial(
+    uniforms,
+    colorspaceMacro,
+    vertexShader,
+    fragmentShader,
+    additionalOptions,
+  )
 
-  const geometry = createGeometry(height, width, uniforms.step.value)
+  const geometry = createGeometry(height, width, step)
   const points = new THREE.Points(geometry, material)
   return points
 }
