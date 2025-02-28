@@ -51,8 +51,8 @@ const createVideoPlane = (video) => {
   return videoPlane
 }
 
-const createColorspaceObjects = (colorspaceObjectsParameters) => {
-  const { uniforms, selectedColorSpace, step, video } = colorspaceObjectsParameters
+const createColorspaceObjects = (colorspaceParams) => {
+  const { uniforms, selectedColorSpace, step, video } = colorspaceParams
   const texture = new THREE.VideoTexture(video)
 
   texture.minFilter = THREE.NearestFilter
@@ -98,13 +98,13 @@ const createColorspaceObjects = (colorspaceObjectsParameters) => {
   return colorspaceObjects
 }
 
-export const updateObjects = (scene, colorspaceObjectsParameters) => {
-  const videoPlaneObject = createVideoPlane(colorspaceObjectsParameters.video)
+export const updateObjects = (scene, colorspaceParams) => {
+  const videoPlaneObject = createVideoPlane(colorspaceParams.video)
   const previousVideoPlaneObject = scene.getObjectByName(videoPlaneObject.name)
   if (previousVideoPlaneObject) scene.remove(previousVideoPlaneObject)
   scene.add(videoPlaneObject)
 
-  const colorspaceObjects = createColorspaceObjects(colorspaceObjectsParameters)
+  const colorspaceObjects = createColorspaceObjects(colorspaceParams)
   const previousColorspaceObjects = scene.getObjectByName(colorspaceObjects.name)
   if (previousColorspaceObjects) scene.remove(previousColorspaceObjects)
   scene.add(colorspaceObjects)

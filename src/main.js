@@ -67,8 +67,7 @@ const main = async () => {
   // start video
   // --------------------------
   video.onloadeddata = () => {
-    updateObjects(scene, colorspaceParameters)
-
+    onChange()
     video.play()
   }
 
