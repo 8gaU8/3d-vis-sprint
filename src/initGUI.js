@@ -57,7 +57,7 @@ export const initGUI = (colorspaceParams, onChange) => {
     video.onloadeddata = () => {
       colorspaceParams.video = video
       onChange()
-      if (value === 'video') video.play()
+      video.play()
       console.log('set to', colorspaceParams.video)
     }
   })
