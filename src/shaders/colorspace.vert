@@ -45,21 +45,6 @@ void main() {
 
   gl_PointSize = pow(1.-length(position.xy - .5), 2.)  * pointSize;
   vec3 pointPosition = COLOR_SPACE;
-  // if (type == 0) {
-  //   pointPosition = color.rgb;
-
-  // } else if(type == 1) {
-  //   // XYZ
-  //   pointPosition = rgb2XYZ(color.rgb);
-
-  // } else if(type == 2){
-  //   // xyY
-  //   pointPosition = XYZ2xyY(rgb2XYZ(color.rgb));
-
-  // } else if(type == 3){
-  //   // Lab
-  //   pointPosition = XYZ2Lab(rgb2XYZ(color.rgb)) / 10.;
-  // }
   gl_Position = projectionMatrix * modelViewMatrix * vec4(pointPosition, 1.0);
 
 }

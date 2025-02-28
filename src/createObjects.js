@@ -90,9 +90,6 @@ export const createColorspaceObjects = (colorspaceObjectsParameters) => {
     width,
     shadowVertexShader,
     shadowFragmentShader,
-    {
-      transparent: false,
-    },
   )
 
   colorspaceObjects.add(pointShadowObject)
