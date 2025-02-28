@@ -3881,30 +3881,16 @@ void main() {
 
   gl_PointSize = pow(1.-length(position.xy - .5), 2.)  * pointSize;
   vec3 pointPosition = COLOR_SPACE;
-  // if (type == 0) {
-  //   pointPosition = color.rgb;
-
-  // } else if(type == 1) {
-  //   // XYZ
-  //   pointPosition = rgb2XYZ(color.rgb);
-
-  // } else if(type == 2){
-  //   // xyY
-  //   pointPosition = XYZ2xyY(rgb2XYZ(color.rgb));
-
-  // } else if(type == 3){
-  //   // Lab
-  //   pointPosition = XYZ2Lab(rgb2XYZ(color.rgb)) / 10.;
-  // }
   gl_Position = projectionMatrix * modelViewMatrix * vec4(pointPosition, 1.0);
 
-}`,T_=`
+}`,T_=`uniform float alpha;
+
 void main() {
   if (length(2. * gl_PointCoord - 1.) > 1.0)
     discard;  
 
   gl_FragColor.rgb = vec3(0.0, 0.0, 0.0);
-  gl_FragColor.a = 0.8;
+  gl_FragColor.a = alpha;
 
 }`,A_=`uniform sampler2D tex;
 uniform int type;
@@ -3912,7 +3898,7 @@ uniform float pointSize;
 
 varying vec3 color;
 
-#define f(t) t > 0.00885645 ? pow(t, 1./3.) : t / (3. * 0.04280618) + 0.13793103
+#define f(t) t > 0.00885645 ? pow(t, 1./3.) : t / 0.12841854 + 0.13793103
 
 vec3 XYZ2Lab(vec3 XYZ) {
   // Under D65
@@ -3949,29 +3935,14 @@ vec3 XYZ2xyY(vec3 XYZ) {
 }
 
 void main() {
-
   color = texture2D ( tex, position.xy ).rgb;
+
   gl_PointSize = pow(1.-length(position.xy - .5), 2.)  * pointSize;
-  vec3 pointPosition;
-  if (type == 0) {
-    pointPosition = color.rgb;
-
-  } else if(type == 1) {
-    // XYZ
-    pointPosition = rgb2XYZ(color.rgb);
-
-  } else if(type == 2){
-    // xyY
-    pointPosition = XYZ2xyY(rgb2XYZ(color.rgb));
-
-  } else if(type == 3){
-    // Lab
-    pointPosition = XYZ2Lab(rgb2XYZ(color.rgb)) / 10.;
-  }
-  pointPosition.y = 0.;
+  vec3 pointPosition = COLOR_SPACE;
+  pointPosition.y = 0.0;
   gl_Position = projectionMatrix * modelViewMatrix * vec4(pointPosition, 1.0);
 
-}`,tr={RGB:{COLOR_SPACE:"color.rgb"},XYZ:{COLOR_SPACE:"rgb2XYZ(color.rgb)"},xyY:{COLOR_SPACE:"XYZ2xyY(rgb2XYZ(color.rgb))"},Lab:{COLOR_SPACE:"XYZ2Lab(rgb2XYZ(color.rgb)) / 10."}},w_=Object.keys(tr),R_=(s,e,t)=>{const n=new ii(e,t),i=new on({map:s,side:Zt}),r=new St(n,i);return r.position.z=-.5,r.position.y=t/2,r.receiveShadow=!1,r.castShadow=!1,r},C_=()=>{const s=new ii(10,10),e=new Vu({color:16777215}),t=new St(s,e);return t.position.y=-.01,t.rotation.x=-Math.PI/2,t.receiveShadow=!1,t},P_=s=>{const e=new Pc(s);e.minFilter=mt,e.magFilter=mt,e.generateMipmaps=!1,e.format=Ut;const t=1,n=2,i=n*s.videoHeight/s.videoWidth,r=R_(e,n,i);return r.translateY(t),r.name="videoPlane",r},L_=s=>{const{uniforms:e,selectedColorSpace:t,step:n,video:i}=s,r=new Pc(i);r.minFilter=mt,r.magFilter=mt,r.generateMipmaps=!1,r.format=Ut;const o=i.videoHeight,a=i.videoWidth,l=1,c=new an;e.tex.value=r,console.log("eselected macro:",t,tr[t]);const h=Wl(e,tr[t],n,o,a,b_,S_);h.translateY(l),c.add(h);const d=Wl(e,tr[t],n,o,a,A_,T_,{transparent:!1});return c.add(d),c.name="colorspaceObjects",c},Xl=(s,e)=>{const t=L_(e),n=s.getObjectByName(t.name);n&&s.remove(n),s.add(t)};class zi{static createButton(e,t={}){const n=document.createElement("button");function i(){let c=null;async function h(p){p.addEventListener("end",d),await e.xr.setSession(p),n.textContent="EXIT VR",c=p}function d(){c.removeEventListener("end",d),n.textContent="ENTER VR",c=null}n.style.display="",n.style.cursor="pointer",n.style.left="calc(50% - 50px)",n.style.width="100px",n.textContent="ENTER VR";const u={...t,optionalFeatures:["local-floor","bounded-floor","layers",...t.optionalFeatures||[]]};n.onmouseenter=function(){n.style.opacity="1.0"},n.onmouseleave=function(){n.style.opacity="0.5"},n.onclick=function(){c===null?navigator.xr.requestSession("immersive-vr",u).then(h):(c.end(),navigator.xr.offerSession!==void 0&&navigator.xr.offerSession("immersive-vr",u).then(h).catch(p=>{console.warn(p)}))},navigator.xr.offerSession!==void 0&&navigator.xr.offerSession("immersive-vr",u).then(h).catch(p=>{console.warn(p)})}function r(){n.style.display="",n.style.cursor="auto",n.style.left="calc(50% - 75px)",n.style.width="150px",n.onmouseenter=null,n.onmouseleave=null,n.onclick=null}function o(){r(),n.textContent="VR NOT SUPPORTED"}function a(c){r(),console.warn("Exception when trying to call xr.isSessionSupported",c),n.textContent="VR NOT ALLOWED"}function l(c){c.style.position="absolute",c.style.bottom="20px",c.style.padding="12px 6px",c.style.border="1px solid #fff",c.style.borderRadius="4px",c.style.background="rgba(0,0,0,0.1)",c.style.color="#fff",c.style.font="normal 13px sans-serif",c.style.textAlign="center",c.style.opacity="0.5",c.style.outline="none",c.style.zIndex="999"}if("xr"in navigator)return n.id="VRButton",n.style.display="none",l(n),navigator.xr.isSessionSupported("immersive-vr").then(function(c){c?i():o(),c&&zi.xrSessionIsGranted&&n.click()}).catch(a),n;{const c=document.createElement("a");return window.isSecureContext===!1?(c.href=document.location.href.replace(/^http:/,"https:"),c.innerHTML="WEBXR NEEDS HTTPS"):(c.href="https://immersiveweb.dev/",c.innerHTML="WEBXR NOT AVAILABLE"),c.style.left="calc(50% - 90px)",c.style.width="180px",c.style.textDecoration="none",l(c),c}}static registerSessionGrantedListener(){if(typeof navigator<"u"&&"xr"in navigator){if(/WebXRViewer\//i.test(navigator.userAgent))return;navigator.xr.addEventListener("sessiongranted",()=>{zi.xrSessionIsGranted=!0})}}}zi.xrSessionIsGranted=!1;zi.registerSessionGrantedListener();const D_=s=>{if(s===fs){const t=window.innerWidth/window.innerHeight,n=new fs(40*t/-2,40*t/2,40/2,40/-2,.1,1e3);return n.rotation.x=-Math.PI/3.5,n.position.y=10,n.position.z=10,n}if(s===Mt){const e=new Mt(100,window.innerWidth/window.innerHeight,.001,1e4);return e.position.y=1,e.position.z=2,e.rotation.y=-Math.PI,e}return null},I_=()=>{const s=new o_({antialias:!0});return s.xr.enabled=!0,s.shadowMap.enabled=!1,document.body.appendChild(zi.createButton(s)),s.setSize(window.innerWidth,window.innerHeight),s.setPixelRatio(window.devicePixelRatio),s},N_=()=>{const s=new Lu;return s.background=new be(13421772),s},U_=s=>{const e=new hd(4210752);e.name="ambientLight",s.add(e);const t=new Uc(16777215,.5);t.position.set(0,1,0),t.castShadow=!0,t.name="directionalLight",s.add(t)};/**
+}`,tr={RGB:{COLOR_SPACE:"color.rgb"},XYZ:{COLOR_SPACE:"rgb2XYZ(color.rgb)"},xyY:{COLOR_SPACE:"XYZ2xyY(rgb2XYZ(color.rgb))"},Lab:{COLOR_SPACE:"XYZ2Lab(rgb2XYZ(color.rgb)) / 10."}},w_=Object.keys(tr),R_=(s,e,t)=>{const n=new ii(e,t),i=new on({map:s,side:Zt}),r=new St(n,i);return r.position.z=-.5,r.position.y=t/2,r.receiveShadow=!1,r.castShadow=!1,r},C_=()=>{const s=new ii(10,10),e=new Vu({color:16777215}),t=new St(s,e);return t.position.y=-.01,t.rotation.x=-Math.PI/2,t.receiveShadow=!1,t},P_=s=>{const e=new Pc(s);e.minFilter=mt,e.magFilter=mt,e.generateMipmaps=!1,e.format=Ut;const t=1,n=2,i=n*s.videoHeight/s.videoWidth,r=R_(e,n,i);return r.translateY(t),r.name="videoPlane",r},L_=s=>{const{uniforms:e,selectedColorSpace:t,step:n,video:i}=s,r=new Pc(i);r.minFilter=mt,r.magFilter=mt,r.generateMipmaps=!1,r.format=Ut;const o=i.videoHeight,a=i.videoWidth,l=1,c=new an;e.tex.value=r,console.log("eselected macro:",t,tr[t]);const h=Wl(e,tr[t],n,o,a,b_,S_);h.translateY(l),c.add(h);const d=Wl(e,tr[t],n,o,a,A_,T_);return c.add(d),c.name="colorspaceObjects",c},Xl=(s,e)=>{const t=L_(e),n=s.getObjectByName(t.name);n&&s.remove(n),s.add(t)};class zi{static createButton(e,t={}){const n=document.createElement("button");function i(){let c=null;async function h(p){p.addEventListener("end",d),await e.xr.setSession(p),n.textContent="EXIT VR",c=p}function d(){c.removeEventListener("end",d),n.textContent="ENTER VR",c=null}n.style.display="",n.style.cursor="pointer",n.style.left="calc(50% - 50px)",n.style.width="100px",n.textContent="ENTER VR";const u={...t,optionalFeatures:["local-floor","bounded-floor","layers",...t.optionalFeatures||[]]};n.onmouseenter=function(){n.style.opacity="1.0"},n.onmouseleave=function(){n.style.opacity="0.5"},n.onclick=function(){c===null?navigator.xr.requestSession("immersive-vr",u).then(h):(c.end(),navigator.xr.offerSession!==void 0&&navigator.xr.offerSession("immersive-vr",u).then(h).catch(p=>{console.warn(p)}))},navigator.xr.offerSession!==void 0&&navigator.xr.offerSession("immersive-vr",u).then(h).catch(p=>{console.warn(p)})}function r(){n.style.display="",n.style.cursor="auto",n.style.left="calc(50% - 75px)",n.style.width="150px",n.onmouseenter=null,n.onmouseleave=null,n.onclick=null}function o(){r(),n.textContent="VR NOT SUPPORTED"}function a(c){r(),console.warn("Exception when trying to call xr.isSessionSupported",c),n.textContent="VR NOT ALLOWED"}function l(c){c.style.position="absolute",c.style.bottom="20px",c.style.padding="12px 6px",c.style.border="1px solid #fff",c.style.borderRadius="4px",c.style.background="rgba(0,0,0,0.1)",c.style.color="#fff",c.style.font="normal 13px sans-serif",c.style.textAlign="center",c.style.opacity="0.5",c.style.outline="none",c.style.zIndex="999"}if("xr"in navigator)return n.id="VRButton",n.style.display="none",l(n),navigator.xr.isSessionSupported("immersive-vr").then(function(c){c?i():o(),c&&zi.xrSessionIsGranted&&n.click()}).catch(a),n;{const c=document.createElement("a");return window.isSecureContext===!1?(c.href=document.location.href.replace(/^http:/,"https:"),c.innerHTML="WEBXR NEEDS HTTPS"):(c.href="https://immersiveweb.dev/",c.innerHTML="WEBXR NOT AVAILABLE"),c.style.left="calc(50% - 90px)",c.style.width="180px",c.style.textDecoration="none",l(c),c}}static registerSessionGrantedListener(){if(typeof navigator<"u"&&"xr"in navigator){if(/WebXRViewer\//i.test(navigator.userAgent))return;navigator.xr.addEventListener("sessiongranted",()=>{zi.xrSessionIsGranted=!0})}}}zi.xrSessionIsGranted=!1;zi.registerSessionGrantedListener();const D_=s=>{if(s===fs){const t=window.innerWidth/window.innerHeight,n=new fs(40*t/-2,40*t/2,40/2,40/-2,.1,1e3);return n.rotation.x=-Math.PI/3.5,n.position.y=10,n.position.z=10,n}if(s===Mt){const e=new Mt(100,window.innerWidth/window.innerHeight,.001,1e4);return e.position.y=1,e.position.z=2,e.rotation.y=-Math.PI,e}return null},I_=()=>{const s=new o_({antialias:!0});return s.xr.enabled=!0,s.shadowMap.enabled=!1,document.body.appendChild(zi.createButton(s)),s.setSize(window.innerWidth,window.innerHeight),s.setPixelRatio(window.devicePixelRatio),s},N_=()=>{const s=new Lu;return s.background=new be(13421772),s},U_=s=>{const e=new hd(4210752);e.name="ambientLight",s.add(e);const t=new Uc(16777215,.5);t.position.set(0,1,0),t.castShadow=!0,t.name="directionalLight",s.add(t)};/**
  * lil-gui
  * https://lil-gui.georgealways.com
  * @version 0.17.0
