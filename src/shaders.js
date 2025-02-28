@@ -1,7 +1,20 @@
 /* eslint-disable import/no-unresolved */
-import fragmentShader from './shaders/fragment.frag?raw'
-import fragmentShadowShader from './shaders/shadow.frag?raw'
-import vertexShadowShader from './shaders/shadow.vert?raw'
-import vertexShader from './shaders/vertex.vert?raw'
+import colorspaceFragementShader from './shaders/colorspace.frag?raw'
+import colorspaceVertexShader from './shaders/colorspace.vert?raw'
+import shadowFragmentShader from './shaders/shadow.frag?raw'
+import shadowVertexShader from './shaders/shadow.vert?raw'
 
-export { fragmentShader, fragmentShadowShader, vertexShadowShader, vertexShader }
+const colorspaceMacros = {
+  RGB: 'color.rgb',
+  XYZ: 'rgb2XYZ(color.rgb)',
+  xyY: 'rgb2xyY(color.rgb)',
+  Lab: 'rgb2Lab(color.rgb)',
+}
+
+export {
+  colorspaceFragementShader,
+  colorspaceVertexShader,
+  shadowFragmentShader,
+  shadowVertexShader,
+  colorspaceMacros,
+}

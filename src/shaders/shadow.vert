@@ -36,8 +36,7 @@ vec3 rgb2XYZ(vec3 rgb) {
   return vec3(X, Y, Z);
 }
 
-vec3 rgb2xyY(vec3 rgb) {
-  vec3 XYZ = rgb2XYZ(rgb);
+vec3 XYZ2xyY(vec3 XYZ) {
 
   return vec3(
     XYZ.x / (XYZ.x + XYZ.y + XYZ.z),
@@ -60,7 +59,7 @@ void main() {
 
   } else if(type == 2){
     // xyY
-    pointPosition = rgb2xyY(color.rgb);
+    pointPosition = XYZ2xyY(rgb2XYZ(color.rgb));
 
   } else if(type == 3){
     // Lab

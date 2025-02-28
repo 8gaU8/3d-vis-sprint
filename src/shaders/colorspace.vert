@@ -13,13 +13,13 @@ float f(float t){
 
 vec3 XYZ2Lab(vec3 XYZ) {
   // Under D65
-  float Xn = 95.0489;
-  float Yn = 100.;
-  float Zn = 108.8840;
+  // float Xn = 95.0489;
+  // float Yn = 100.;
+  // float Zn = 108.8840;
 
-  float fX = f(XYZ.x / Xn);
-  float fY = f(XYZ.y / Yn); 
-  float fZ = f(XYZ.z / Zn);
+  float fX = f(XYZ.x / 95.0489);
+  float fY = f(XYZ.y / 100.); 
+  float fZ = f(XYZ.z / 108.8840);
   float L = 116. * fX - 16.;
   float a = 500. * (fX - fY);
   float b = 200. * (fY - fZ);
@@ -36,8 +36,7 @@ vec3 rgb2XYZ(vec3 rgb) {
   return vec3(X, Y, Z);
 }
 
-vec3 rgb2xyY(vec3 rgb) {
-  vec3 XYZ = rgb2XYZ(rgb);
+vec3 XYZ2xyY(vec3 XYZ) {
 
   return vec3(
     XYZ.x / (XYZ.x + XYZ.y + XYZ.z),
@@ -60,7 +59,7 @@ void main() {
 
   } else if(type == 2){
     // xyY
-    pointPosition = rgb2xyY(color.rgb);
+    pointPosition = XYZ2xyY(rgb2XYZ(color.rgb));
 
   } else if(type == 3){
     // Lab
