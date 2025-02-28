@@ -20,7 +20,6 @@ const createTexturePlane = (texture, videoPlaneWidth, videoPlaneHeight) => {
   return videoPlane
 }
 
-
 export const createFloor = () => {
   const geometry = new THREE.PlaneGeometry(10, 10)
   const material = new THREE.MeshLambertMaterial({ color: 0xffffff })
@@ -31,10 +30,27 @@ export const createFloor = () => {
   return floor
 }
 
-export const createVideoObjects = (scene, uniforms, colorspaceMacro, video) => {
-  const previousVideoObjects = scene.getObjectByName('videoObjects')
-  if (previousVideoObjects) scene.remove(previousVideoObjects)
+export const createVideoPlane = (video) => {
+  const texture = new THREE.VideoTexture(video)
 
+  texture.minFilter = THREE.NearestFilter
+  texture.magFilter = THREE.NearestFilter
+  texture.generateMipmaps = false
+  texture.format = THREE.RGBAFormat
+
+  // building objects
+  const objsHeight = 1
+
+  // build video plane
+  const videoPlaneWidth = 2
+  const videoPlaneHeight = (videoPlaneWidth * video.videoHeight) / video.videoWidth
+  const videoPlane = createTexturePlane(texture, videoPlaneWidth, videoPlaneHeight)
+  videoPlane.translateY(objsHeight)
+  videoPlane.name = 'videoPlane'
+  return videoPlane
+}
+
+export const createColorspaceObjects = (uniforms, colorspaceMacro, video) => {
   const texture = new THREE.VideoTexture(video)
 
   texture.minFilter = THREE.NearestFilter
@@ -47,15 +63,7 @@ export const createVideoObjects = (scene, uniforms, colorspaceMacro, video) => {
   const width = video.videoWidth
   const objsHeight = 1
 
-  const videoObjects = new THREE.Group()
-  videoObjects.name = 'videoObjects'
-
-  // build video plane
-  const videoPlaneWidth = 2
-  const videoPlaneHeight = (videoPlaneWidth * video.videoHeight) / video.videoWidth
-  const videoPlane = createTexturePlane(texture, videoPlaneWidth, videoPlaneHeight)
-  videoPlane.translateY(objsHeight)
-  videoObjects.add(videoPlane)
+  const colorspaceObjects = new THREE.Group()
 
   uniforms.tex.value = texture
 
@@ -68,7 +76,7 @@ export const createVideoObjects = (scene, uniforms, colorspaceMacro, video) => {
     colorspaceFragementShader,
   )
   pointObject.translateY(objsHeight)
-  videoObjects.add(pointObject)
+  colorspaceObjects.add(pointObject)
 
   const pointShadowObject = createPoints(
     uniforms,
@@ -82,11 +90,15 @@ export const createVideoObjects = (scene, uniforms, colorspaceMacro, video) => {
     },
   )
 
-  videoObjects.add(pointShadowObject)
-  return videoObjects
+  colorspaceObjects.add(pointShadowObject)
+  return colorspaceObjects
 }
 
-export const objectsUpdaterFactory = (scene, colorspaceMacro, uniforms, video) => () => {
-  const objs = createVideoObjects(scene, colorspaceMacro, uniforms, video)
-  scene.add(objs)
+export const updateObjectsFactory = (scene, colorspaceMacro, uniforms, video) => () => {
+  const colorspaceObjectsName = 'colorspaceObjects'
+  const previousColorspaceObjects = scene.getObjectByName(colorspaceObjectsName)
+  if (previousColorspaceObjects) scene.remove(previousColorspaceObjects)
+  const colorspaceObjects = createColorspaceObjects(colorspaceMacro, uniforms, video)
+  colorspaceObjects.name = colorspaceObjectsName
+  scene.add(colorspaceObjects)
 }

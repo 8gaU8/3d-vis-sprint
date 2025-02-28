@@ -1,56 +1,6 @@
-import * as THREE from 'three'
-import { HTMLMesh, InteractiveGroup, XRControllerModelFactory } from 'three/examples/jsm/Addons.js'
 import { GUI } from 'three/examples/jsm/libs/lil-gui.module.min.js'
 
-const initControllers = (scene, renderer) => {
-  const geometry = new THREE.BufferGeometry()
-  geometry.setFromPoints([new THREE.Vector3(0, 0, 0), new THREE.Vector3(0, 0, -5)])
-
-  const controller1 = renderer.xr.getController(0)
-  controller1.add(new THREE.Line(geometry))
-  scene.add(controller1)
-
-  const controller2 = renderer.xr.getController(1)
-  controller2.add(new THREE.Line(geometry))
-  scene.add(controller2)
-
-  const controllerModelFactory = new XRControllerModelFactory()
-
-  const controllerGrip1 = renderer.xr.getControllerGrip(0)
-  controllerGrip1.add(controllerModelFactory.createControllerModel(controllerGrip1))
-  scene.add(controllerGrip1)
-
-  const controllerGrip2 = renderer.xr.getControllerGrip(1)
-  controllerGrip2.add(controllerModelFactory.createControllerModel(controllerGrip2))
-  scene.add(controllerGrip2)
-  return { controller1, controller2 }
-}
-
-const initInteractiveGroup = (scene, renderer, camera, controllers, gui) => {
-  const { controller1, controller2 } = controllers
-  const group = new InteractiveGroup()
-  group.listenToPointerEvents(renderer, camera)
-  group.listenToXRControllerEvents(controller1)
-  group.listenToXRControllerEvents(controller2)
-
-  const mesh = new HTMLMesh(gui.domElement)
-  mesh.position.x = 1.5
-  mesh.position.y = 1.5
-  mesh.position.z = 0.5
-  mesh.rotation.y = -Math.PI / 2 + Math.PI / 3
-  mesh.scale.setScalar(2)
-  group.add(mesh)
-
-  scene.add(group)
-}
-
-const initXrGUI = (uniforms, video, scene, renderer, camera, updateObjects) => {
-  // define controllers
-  const controllers = initControllers(scene, renderer)
-  const gui = initNormalGUI(uniforms, video, updateObjects)
-  initInteractiveGroup(scene, renderer, camera, controllers, gui)
-  return gui
-}
+import { initControllers, initInteractiveGroup } from './xr'
 
 const initNormalGUI = (uniforms, video, updateObjects) => {
   const colorSpaceOnChange = (value) => {
@@ -109,18 +59,18 @@ const initNormalGUI = (uniforms, video, updateObjects) => {
 }
 
 export class GUIManager {
-  constructor(uniforms, video, scene, renderer, camera, updateObjects) {
+  constructor(uniforms, video, scene, updateObjects, xrControllerManager) {
     this.uniforms = uniforms
     this.video = video
     this.scene = scene
-    this.renderer = renderer
-    this.camera = camera
     this.updateObjects = updateObjects
+    this.xrControllerManager = xrControllerManager
   }
 
   init() {
     this.gui = initNormalGUI(this.uniforms, this.video, this.updateObjects)
-    this.addEventListeners()
+    this.xrGUI = this.xrControllerManager.getXrGUI(this.gui)
+    console.log(this.scene)
     this.updateObjects()
   }
 
@@ -134,21 +84,27 @@ export class GUIManager {
   }
 
   enableXR() {
-    if (this.gui) this.gui.destroy()
     console.log('enableXR')
-    this.gui = initXrGUI(
-      this.uniforms,
-      this.video,
-      this.scene,
-      this.renderer,
-      this.camera,
-      this.updateObjects,
-    )
+
+    const prev = this.scene.getObjectByName(this.xrGUI.name)
+    if (!prev) this.scene.add(this.xrGUI)
+
+    // if (this.gui) this.gui.destroy()
+    // // const guiMesh = this.xrControllerManager.getXrGUI(this.gui)
+
+    // const gui = initNormalGUI(this.uniforms, this.video, this.updateObjects)
+    // const {xRcontollerGroup, controllers, controllerGrips} = initControllers(this.renderer)
+    // this.scene.add(xRcontollerGroup)
+
+    // initInteractiveGroup(this.scene, this.renderer, this.camera, controllers, gui)
+    // this.gui = gui
   }
 
   disableXR() {
-    if (this.gui) this.gui.destroy()
     console.log('disableXR')
-    this.gui = initNormalGUI(this.uniforms, this.video, this.updateObjects)
+    const prev = this.scene.getObjectByName(this.xrGUI.name)
+    if (prev) this.scene.remove(prev)
+    // if (this.gui) this.gui.destroy()
+    // this.gui = initNormalGUI(this.uniforms, this.video, this.updateObjects)
   }
 }
