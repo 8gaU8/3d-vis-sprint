@@ -8,7 +8,7 @@ import { createFloor, updateObjects } from './createObjects'
 import { initCamera, initLights, initRenderer, initScene } from './init'
 import { GUIManager, initGUI } from './initGUI'
 import { ColorspaceParameters } from './parameters'
-import { drawHelper, onWindowResizeFactory } from './utils'
+import { onWindowResizeFactory } from './utils'
 import { generateVideoElement } from './videoElement'
 import { XRControllerManager } from './xr'
 
@@ -71,7 +71,7 @@ const main = async () => {
     video.play()
   }
 
-  drawHelper(scene)
+  // drawHelper(scene)
 
   const render = () => {
     renderer.render(scene, camera)
