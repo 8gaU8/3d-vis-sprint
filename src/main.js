@@ -4,15 +4,17 @@ import * as THREE from 'three'
 import { OrbitControls } from 'three/addons/controls/OrbitControls.js'
 import Stats from 'three/addons/libs/stats.module.js'
 
-import { createFloor, createVideoPlane, updateObjects } from './createObjects'
+import { createFloor, updateObjects } from './createObjects'
 import { initCamera, initLights, initRenderer, initScene } from './init'
 import { GUIManager, initGUI } from './initGUI'
+import { ColorspaceParameters } from './parameters'
 import { drawHelper, onWindowResizeFactory } from './utils'
 import { generateVideoElement } from './videoElement'
 import { XRControllerManager } from './xr'
 
 const main = async () => {
   // initial setup
+  // --------------------------
   const container = document.getElementById('container')
   const camera = initCamera(THREE.PerspectiveCamera)
   const scene = initScene()
@@ -31,28 +33,26 @@ const main = async () => {
   container.appendChild(stats.dom)
 
   // setup video
+  // --------------------------
   const video = await generateVideoElement()
 
   // define parameters of colorspace objects
+  // --------------------------
   const uniforms = {
     tex: { type: 't', value: null },
     pointSize: { type: 'f', value: 10.0 },
     type: { type: 'i', value: 0 },
     alpha: { type: 'f', value: 0.9 },
   }
-
-  const colorspaceObjectsParameters = {
-    uniforms: uniforms,
-    selectedColorSpace: 'RGB',
-    step: 3,
-    video: video,
-  }
+  const colorspaceParameters = new ColorspaceParameters(uniforms, video)
 
   // setup XR andGUI
-  const onChange = (newColorspaceObjParameters) => {
-    updateObjects(scene, newColorspaceObjParameters)
+  // --------------------------
+  const onChange = () => {
+    updateObjects(scene, colorspaceParameters)
   }
-  const gui = initGUI(colorspaceObjectsParameters, onChange)
+
+  const gui = initGUI(colorspaceParameters, onChange)
   const xrControllerManager = new XRControllerManager(renderer, camera)
   const guiManager = new GUIManager(gui, scene, xrControllerManager)
   // XR events
@@ -65,11 +65,9 @@ const main = async () => {
   })
 
   // start video
+  // --------------------------
   video.onloadeddata = () => {
-    updateObjects(scene, colorspaceObjectsParameters)
-
-    const videoPlane = createVideoPlane(video)
-    scene.add(videoPlane)
+    updateObjects(scene, colorspaceParameters)
 
     video.play()
   }

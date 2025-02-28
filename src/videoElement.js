@@ -1,14 +1,14 @@
 import imageUrl from './images/video.webm'
 
 const getWebcamStream = async () => {
-  const stream = await navigator.mediaDevices.getUserMedia({ video: true })
   const video = document.getElementById('webcam')
+  const stream = await navigator.mediaDevices.getUserMedia({ video: true })
   video.srcObject = stream
   return video
 }
 
 const getVideoStream = () => {
-  const video = document.createElement('video')
+  const video = document.getElementById('video')
   video.src = imageUrl
   video.load()
   video.muted = true
@@ -16,10 +16,7 @@ const getVideoStream = () => {
   return video
 }
 
-export const generateVideoElement = async () => {
-  const curUrl = new URL(window.location.href)
-  const isWebcamEnabled = curUrl.searchParams.size !== 0
-
-  if (isWebcamEnabled) return await getWebcamStream()
+export const generateVideoElement = async (useWebcam = false) => {
+  if (useWebcam) return await getWebcamStream()
   else return getVideoStream()
 }

@@ -1,8 +1,9 @@
 import { GUI } from 'three/examples/jsm/libs/lil-gui.module.min.js'
 
 import { colorspaceNames } from './shaders'
+import { generateVideoElement } from './videoElement'
 
-export const initGUI = (colorspaceObjParameters, onColorspaceObjParamChange) => {
+export const initGUI = (colorspaceObjParameters, onChange) => {
   const { uniforms, video } = colorspaceObjParameters
 
   const gui = new GUI({ width: 300 })
@@ -12,7 +13,7 @@ export const initGUI = (colorspaceObjParameters, onColorspaceObjParamChange) => 
 
   const onColorspaceChange = (value) => {
     colorspaceObjParameters.selectedColorSpace = value
-    onColorspaceObjParamChange(colorspaceObjParameters)
+    onChange()
   }
 
   const genColorSpaceButton = (name) => {
@@ -28,7 +29,7 @@ export const initGUI = (colorspaceObjParameters, onColorspaceObjParamChange) => 
   materialGUI.add(uniforms.alpha, 'value', 0, 1).name('Alpha')
   materialGUI.add(uniforms.pointSize, 'value', 2, 10).name('Point Size')
   materialGUI.add(colorspaceObjParameters, 'step', 1, 10, 1).onFinishChange(() => {
-    onColorspaceObjParamChange(colorspaceObjParameters)
+    onChange()
   })
 
   // video controls
@@ -49,6 +50,18 @@ export const initGUI = (colorspaceObjParameters, onColorspaceObjParamChange) => 
   videoGUI.add(pausePlayObj, 'pausePlay')
   videoGUI.add(pausePlayObj, 'add10sec')
   videoGUI.add(pausePlayObj, 'sub10sec')
+  videoGUI.add({ source: 'video' }, 'source', ['video', 'webcam']).onChange(async (value) => {
+    console.log('--', colorspaceObjParameters.video)
+    let video = null
+    if (value === 'video') video = await generateVideoElement(false)
+    else if (value === 'webcam') video = await generateVideoElement(true)
+    video.onloadeddata = () => {
+      colorspaceObjParameters.video = video
+      onChange()
+      console.log(colorspaceObjParameters.video)
+    }
+  })
+
   return gui
 }
 
