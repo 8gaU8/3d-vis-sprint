@@ -4,7 +4,7 @@ import * as THREE from 'three'
 import { OrbitControls } from 'three/addons/controls/OrbitControls.js'
 import Stats from 'three/addons/libs/stats.module.js'
 
-import { createFloor, objectsUpdaterFactory } from './createObjects'
+import { createFloor, objectsUpdaterFactory as updateObjectsFactory } from './createObjects'
 import { initCamera, initLights, initRenderer, initScene } from './init'
 import { GUIManager } from './initGUI'
 import { drawHelper, onWindowResizeFactory } from './utils'
@@ -25,17 +25,19 @@ const main = async () => {
     alpha: { type: 'f', value: 0.9 },
     step: { type: 'i', value: 3 },
   }
+  const colorspaceMacro = {
+    COLOR_SPACE: "rgb2XYZ(color.rgb)",
+  }
 
   const renderer = initRenderer()
 
   const video = await generateVideoElement()
-  const objectsUpdater = objectsUpdaterFactory(scene, uniforms, video)
+  const updateObjects = updateObjectsFactory(scene, uniforms, colorspaceMacro, video)
 
   video.onloadeddata = () => {
-    objectsUpdater()
     video.play()
 
-    const guiManager = new GUIManager(uniforms, video, scene, renderer, camera, objectsUpdater)
+    const guiManager = new GUIManager(uniforms, video, scene, renderer, camera, updateObjects)
     guiManager.init()
   }
 

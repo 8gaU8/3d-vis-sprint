@@ -1,7 +1,12 @@
 import * as THREE from 'three'
 
 import { createPoints } from './pointObjectHelpers'
-import { fragmentShader, fragmentShadowShader, vertexShader, vertexShadowShader } from './shaders'
+import {
+  colorspaceFragementShader,
+  colorspaceVertexShader,
+  shadowFragmentShader,
+  shadowVertexShader,
+} from './shaders'
 
 const createTexturePlane = (texture, videoPlaneWidth, videoPlaneHeight) => {
   // build video plane
@@ -15,15 +20,6 @@ const createTexturePlane = (texture, videoPlaneWidth, videoPlaneHeight) => {
   return videoPlane
 }
 
-const createColorSpacePoint = (uniforms, height, width) => {
-  return createPoints(uniforms, height, width, vertexShader, fragmentShader)
-}
-
-const createShadowColorSpacePoint = (uniforms, height, width) => {
-  return createPoints(uniforms, height, width, vertexShadowShader, fragmentShadowShader, {
-    transparent: false,
-  })
-}
 
 export const createFloor = () => {
   const geometry = new THREE.PlaneGeometry(10, 10)
@@ -35,7 +31,7 @@ export const createFloor = () => {
   return floor
 }
 
-export const createVideoObjects = (scene, uniforms, video) => {
+export const createVideoObjects = (scene, uniforms, colorspaceMacro, video) => {
   const previousVideoObjects = scene.getObjectByName('videoObjects')
   if (previousVideoObjects) scene.remove(previousVideoObjects)
 
@@ -63,16 +59,34 @@ export const createVideoObjects = (scene, uniforms, video) => {
 
   uniforms.tex.value = texture
 
-  const pointObject = createColorSpacePoint(uniforms, height, width)
+  const pointObject = createPoints(
+    uniforms,
+    colorspaceMacro,
+    height,
+    width,
+    colorspaceVertexShader,
+    colorspaceFragementShader,
+  )
   pointObject.translateY(objsHeight)
   videoObjects.add(pointObject)
 
-  const pointShadowObject = createShadowColorSpacePoint(uniforms, height, width)
+  const pointShadowObject = createPoints(
+    uniforms,
+    colorspaceMacro,
+    height,
+    width,
+    shadowVertexShader,
+    shadowFragmentShader,
+    {
+      transparent: false,
+    },
+  )
+
   videoObjects.add(pointShadowObject)
   return videoObjects
 }
 
-export const objectsUpdaterFactory = (scene, uniforms, video) => () => {
-  const objs = createVideoObjects(scene, uniforms, video)
+export const objectsUpdaterFactory = (scene, colorspaceMacro, uniforms, video) => () => {
+  const objs = createVideoObjects(scene, colorspaceMacro, uniforms, video)
   scene.add(objs)
 }

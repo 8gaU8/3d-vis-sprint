@@ -44,15 +44,15 @@ const initInteractiveGroup = (scene, renderer, camera, controllers, gui) => {
   scene.add(group)
 }
 
-const initXrGUI = (uniforms, video, scene, renderer, camera, objectsUpdater) => {
+const initXrGUI = (uniforms, video, scene, renderer, camera, updateObjects) => {
   // define controllers
   const controllers = initControllers(scene, renderer)
-  const gui = initNormalGUI(uniforms, video, objectsUpdater)
+  const gui = initNormalGUI(uniforms, video, updateObjects)
   initInteractiveGroup(scene, renderer, camera, controllers, gui)
   return gui
 }
 
-const initNormalGUI = (uniforms, video, objectsUpdater) => {
+const initNormalGUI = (uniforms, video, updateObjects) => {
   const colorSpaceOnChange = (value) => {
     console.log('change to color space', value)
     const csNameMap = {
@@ -84,7 +84,8 @@ const initNormalGUI = (uniforms, video, objectsUpdater) => {
     .add(uniforms.step, 'value', 1, 10, 1)
     .name('Step')
     .onFinishChange(() => {
-      objectsUpdater()
+      console.log('step change')
+      updateObjects()
     })
 
   const pausePlayObj = {
@@ -108,18 +109,19 @@ const initNormalGUI = (uniforms, video, objectsUpdater) => {
 }
 
 export class GUIManager {
-  constructor(uniforms, video, scene, renderer, camera, objectsUpdater) {
+  constructor(uniforms, video, scene, renderer, camera, updateObjects) {
     this.uniforms = uniforms
     this.video = video
     this.scene = scene
     this.renderer = renderer
     this.camera = camera
-    this.objectsUpdater = objectsUpdater
+    this.updateObjects = updateObjects
   }
 
   init() {
-    this.gui = initNormalGUI(this.uniforms, this.video, this.objectsUpdater)
+    this.gui = initNormalGUI(this.uniforms, this.video, this.updateObjects)
     this.addEventListeners()
+    this.updateObjects()
   }
 
   addEventListeners() {
@@ -140,13 +142,13 @@ export class GUIManager {
       this.scene,
       this.renderer,
       this.camera,
-      this.objectsUpdater,
+      this.updateObjects,
     )
   }
 
   disableXR() {
     if (this.gui) this.gui.destroy()
     console.log('disableXR')
-    this.gui = initNormalGUI(this.uniforms, this.video, this.objectsUpdater)
+    this.gui = initNormalGUI(this.uniforms, this.video, this.updateObjects)
   }
 }
